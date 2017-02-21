@@ -22,3 +22,12 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# New add
+tags
+*swp
+*.out
+*.d
+*.ut
+build
+example/example
