@@ -18,20 +18,21 @@ const (
 )
 
 func main() {
-	theStr, _ := readAll("rescourse/CIHUI1.txt")
-	arrSlice := strings.Split(string(theStr), "	")
+	theStr, _ := readAll("rescourse/CIHUI2.txt")
+	arrSlice := strings.Split(string(theStr), "\n")
 	// fmt.Println(arrSlice)
 	for i := range arrSlice {
 		a := pinyin.NewArgs()
 		a.Style = 8
-		k := pinyin.Pinyin(arrSlice[i], a)
+		tt := strings.Split(arrSlice[i], "	")[0]
+		k := pinyin.Pinyin(tt, a)
 		var m []string
 		for i := 0; i < len(k); i++ {
 			m = append(m, k[i][0])
 		}
 		b := strings.Join(m, "/")
-		// fmt.Println(i, arrSlice[i], strings.Join(b, "/"))
-		fmt.Println(arrSlice[i], b)
+		fmt.Println("INSERT INTO naturl_language_process.main_single_terms (terms_name, terms_pinyin) VALUES ('" + tt + "', '" + b + "');")
+		// fmt.Println(arrSlice[i], b)
 	}
 }
 
