@@ -2,70 +2,43 @@ package main
 
 import (
 	"fmt"
-	"gojieba"
+	"io/ioutil"
+	"os"
 	"strings"
+
+	pinyin "github.com/mozillazg/go-pinyin"
+)
+
+// HOST USER PASSWORD DBNAME
+const (
+	HOST     = "127.0.0.1"
+	USER     = "root"
+	PASSWORD = ""
+	DBNAME   = "naturl_language_process"
 )
 
 func main() {
-	var s string
-	var words []string
-	use_hmm := true
-	x := gojieba.NewJieba()
-	defer x.Free()
+	theStr, _ := readAll("rescourse/CIHUI1.txt")
+	arrSlice := strings.Split(string(theStr), "	")
+	// fmt.Println(arrSlice)
+	for i := range arrSlice {
+		a := pinyin.NewArgs()
+		a.Style = 8
+		k := pinyin.Pinyin(arrSlice[i], a)
+		var m []string
+		for i := 0; i < len(k); i++ {
+			m = append(m, k[i][0])
+		}
+		b := strings.Join(m, "/")
+		// fmt.Println(i, arrSlice[i], strings.Join(b, "/"))
+		fmt.Println(arrSlice[i], b)
+	}
+}
 
-	// s = "我来到北京清华大学"
-	// words = x.CutAll(s)
-	// fmt.Println(s)
-	// fmt.Println("全模式:", strings.Join(words, " "))
-	// words = x.Cut(s, use_hmm)
-	// fmt.Println(s)
-	// fmt.Println("精确模式:", strings.Join(words, " "))
-
-	s = "碳碳键键能能否否定定律一或定律二"
-	words = x.Cut(s, use_hmm)
-	fmt.Println(s)
-	fmt.Println("精确模式:", strings.Join(words, "/"))
-
-	x.AddWord("碳碳键")
-	x.AddWord("键能")
-	// s = "比特币"
-	words = x.Cut(s, use_hmm)
-	// fmt.Println(s)
-	fmt.Println("添加词典后,精确模式:", strings.Join(words, "/"))
-
-	// s = "他来到了网易杭研大厦"
-	// words = x.Cut(s, use_hmm)
-	// fmt.Println(s)
-	// fmt.Println("新词识别:", strings.Join(words, " "))
-
-	// s = "小明硕士毕业于中国科学院计算所，后在日本京都大学深造"
-	// words = x.CutForSearch(s, use_hmm)
-	// fmt.Println(s)
-	// fmt.Println("搜索引擎模式:", strings.Join(words, " "))
-
-	// s = "长春市长春药店"
-	// words = x.Tag(s)
-	// fmt.Println(s)
-	// fmt.Println("词性标注:", strings.Join(words, ","))
-
-	// s = "区块链"
-	// words = x.Tag(s)
-	// fmt.Println(s)
-	// fmt.Println("词性标注:", strings.Join(words, ","))
-
-	// s = "长江大桥"
-	// words = x.CutForSearch(s, !use_hmm)
-	// fmt.Println(s)
-	// fmt.Println("搜索引擎模式:", strings.Join(words, " "))
-
-	// wordinfos := x.Tokenize(s, gojieba.SearchMode, !use_hmm)
-	// fmt.Println(s)
-	// fmt.Println("Tokenize:(搜索引擎模式)", wordinfos)
-
-	// wordinfos = x.Tokenize(s, gojieba.DefaultMode, !use_hmm)
-	// fmt.Println(s)
-	// fmt.Println("Tokenize:(默认模式)", wordinfos)
-
-	// keywords := x.ExtractWithWeight(s, 5)
-	// fmt.Println("Extract:", keywords)
+func readAll(filePth string) ([]byte, error) {
+	f, err := os.Open(filePth)
+	if err != nil {
+		return nil, err
+	}
+	return ioutil.ReadAll(f)
 }
