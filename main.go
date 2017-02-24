@@ -30,14 +30,13 @@ const (
 // }
 
 func main() {
-	db, _ := gorm.Open("mysql", USER+"@tcp("+HOST+":"+PORT+")/"+DBNAME+"?charset=utf8")
+	db, _ := gorm.Open("mysql", USER+":@tcp("+HOST+":"+PORT+")/"+DBNAME+"?charset=utf8")
 	defer db.Close()
 
-	var user string
+	// var user string
+	// db.Where("word_id = ?", "4").Find(&user)
 
-	x := db.Where("word_id = ?", "4").Find(&user)
-
-	fmt.Println(x, user)
+	// fmt.Println(user)
 
 	getCiXing("你好")
 }
