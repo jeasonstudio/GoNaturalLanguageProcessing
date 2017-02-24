@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/jinzhu/gorm"
+	neo4j "github.com/davemeehan/Neo4j-GO"
 )
 
 // HOST USER PASSWORD DBNAME
@@ -30,13 +30,7 @@ const (
 // }
 
 func main() {
-	db, _ := gorm.Open("mysql", USER+":@tcp("+HOST+":"+PORT+")/"+DBNAME+"?charset=utf8")
-	defer db.Close()
-
-	// var user string
-	// db.Where("word_id = ?", "4").Find(&user)
-
-	// fmt.Println(user)
+	neo, err := neo4j.NewNeo4j()
 
 	getCiXing("你好")
 }
