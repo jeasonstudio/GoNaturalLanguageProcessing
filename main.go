@@ -1,45 +1,36 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"strings"
-
-	pinyin "github.com/mozillazg/go-pinyin"
 )
 
 // HOST USER PASSWORD DBNAME
 const (
 	HOST     = "127.0.0.1"
+	PORT     = "3306"
 	USER     = "root"
 	PASSWORD = ""
 	DBNAME   = "naturl_language_process"
 )
 
-func main() {
-	theStr, _ := readAll("rescourse/CIHUI2.txt")
-	arrSlice := strings.Split(string(theStr), "\n")
-	// fmt.Println(arrSlice)
-	for i := range arrSlice {
-		a := pinyin.NewArgs()
-		a.Style = 8
-		tt := strings.Split(arrSlice[i], "	")[0]
-		k := pinyin.Pinyin(tt, a)
-		var m []string
-		for i := 0; i < len(k); i++ {
-			m = append(m, k[i][0])
-		}
-		b := strings.Join(m, "/")
-		fmt.Println("INSERT INTO naturl_language_process.main_single_terms (terms_name, terms_pinyin) VALUES ('" + tt + "', '" + b + "');")
-		// fmt.Println(arrSlice[i], b)
-	}
+var db *sql.DB
+
+func init() {
+	db, _ = sql.Open("mysql", USER+":@tcp("+HOST+":"+PORT+")/"+DBNAME+"?charset=utf8")
+	db.SetMaxOpenConns(20)
+	db.SetMaxIdleConns(10)
+	db.Ping()
 }
 
-func readAll(filePth string) ([]byte, error) {
-	f, err := os.Open(filePth)
-	if err != nil {
-		return nil, err
+func main() {
+	fmt.Println(HOST)
+	rows, _ := db.Query("SELECT * FROM main_single_word WHERE word_id = '4'")
+	defer rows.Close()
+
+	for rows.Next() {
+		var word_id, word_name, word_pinyin string
+		rows.Scan(&word_id, &word_name, &word_pinyin)
+		fmt.Println("word_id:", word_id, "word_name:", word_name, "word_pinyin:", word_pinyin)
 	}
-	return ioutil.ReadAll(f)
 }
