@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
@@ -51,7 +52,12 @@ func main() {
 	// 	"isT": "true",
 	// }
 	// neo.CreateRelationship(3, 4, real, "BT")
-	neo.DelProperty(0, "name")
+	// neo.Traverse(10, "node", "3", "", nil, 5, nil, nil)
+	data := map[string]string{
+		"s": "b",
+	}
+	dd, _ := neo.CreateNode(data)
+	log.Printf("\nNode data: %v\n", dd)
 
 	// checkErr(err)
 

@@ -9,7 +9,7 @@ go get github.com/davemeehan/Neo4j-GO
 ```
 
 ```bash
-$ neo4j { console | start | stop | restart | status }
+$ neo4j console
 $ chrome http://localhost:7474/browser/
 ```
 
@@ -82,6 +82,11 @@ func (this *Neo4j) GetNode(id uint64) (tmp *NeoTemplate, err error)
 ```
 
 ```Golang
+// DelNode 根据节点 id 删除节点
+func (this *Neo4j) DelNode(id uint64) error
+```
+
+```Golang
 // DelProperty 删除 id 对应节点，或可扩展为删除 id 对应节点对应属性
 func (this *Neo4j) DelProperty(id uint64, s string) error
 ```
@@ -120,5 +125,22 @@ func (this *Neo4j) CreateIdx(id uint64, key string, value string, cat string, id
 ```
 
 ```Golang
+// Traverse 类似关系型数据库中的建表，通过一种算法，使所有节点分别位于各自图下
+// @parameter: {
+// 		id: 节点
+//		returnType: 	
+//		order:
+// 		uniqueness: 
+//		relationships:
+// 		depth: 节点深度
+//		prune: 修剪
+//		filter: 过滤
+//}
+// 返回节点类型数组
 func (this *Neo4j) Traverse(id uint64, returnType string, order string, uniqueness string, relationships map[string]string, depth int, prune map[string]string, filter map[string]string) (map[int]*NeoTemplate, error)
+```
+
+```Golang
+// TraversePath
+func (this *Neo4j) TraversePath(src uint64, dst uint64, relationships map[string]string, depth uint, algo string, paths bool) (map[int]*NeoTemplate, error)
 ```

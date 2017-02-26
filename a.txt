@@ -1,0 +1,10 @@
+{5  
+http://127.0.0.1:7474/db/data/node/5/relationships/out 
+http://127.0.0.1:7474/db/data/node/5/relationships/in 
+http://127.0.0.1:7474/db/data/node/5/relationships/all 
+http://127.0.0.1:7474/db/data/node/5/relationships 
+map[s:b] 
+http://127.0.0.1:7474/db/data/node/5/traverse/{returnType} 
+http://127.0.0.1:7474/db/data/node/5/properties
+/{key} http://127.0.0.1:7474/db/data/node/5/properties 
+http://127.0.0.1:7474/db/data/node/5 map[]      [] []}
