@@ -21,18 +21,39 @@ const (
 )
 
 func main() {
-	fmt.Println(getCiXing("我"))
-	// dat, err := ioutil.ReadFile("rescourse/single_word.tsv")
-	// checkErr(err)
-	// res := strings.Split(string(dat), "\n")
-	// for i := 0; i < 5; i++ {
-	// 	name := strings.Split(res[i], "\t")[1]
-	// 	poSpeech := getCiXing(name)
-	// 	pinyin := strings.Split(res[i], "\t")[2]
-	// 	label := strings.ToUpper(strings.Split(pinyin, "")[0])
-	// 	fmt.Println(name, poSpeech, pinyin, (label))
-	// 	time.Sleep(1 * time.Second)
-	// }
+	// fmt.Println(getCiXing("我"))
+	myNeo, err := neoism.Connect(HOST)
+	checkErr(err)
+
+	dat, err := ioutil.ReadFile("rescourse/single_word.tsv")
+	checkErr(err)
+	res := strings.Split(string(dat), "\n")
+	for i := 0; i < len(res); i++ {
+		name := strings.Split(res[i], "\t")[1]
+		// poSpeech := getCiXing(name)
+		pinyin := strings.Split(res[i], "\t")[2]
+		label := strings.ToUpper(strings.Split(pinyin, "")[0])
+		// fNode, err := myNeo.CreateNode(neoism.Props{"name": name, "pinyin": pinyin})
+		// checkErr(err)
+		// defer fNode.Delete() // Deferred clean up
+		// fNode.AddLabel(label)
+		// log.Printf("\nNode data: %v\n", fNode)
+		fmt.Println(name + "," + pinyin + "," + (label))
+
+		res0 := []struct {
+			N neoism.Node // Column "n" gets automagically unmarshalled into field N
+		}{}
+		cq0 := neoism.CypherQuery{
+			Statement: "CREATE (n:" + label + " {name: {name},pinyin: {pinyin}}) RETURN n",
+			// Use parameters instead of constructing a query string
+			Parameters: neoism.Props{"name": name, "pinyin": pinyin},
+			Result:     &res0,
+		}
+		myNeo.Cypher(&cq0)
+		n1 := res0[0].N // Only one row of data returned
+		n1.Db = myNeo   // Must manually set Db with objects returned from Cypher query
+
+	}
 }
 
 func connectToNeo4j() {
