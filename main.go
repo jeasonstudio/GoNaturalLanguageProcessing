@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"gopkg.in/jmcvetta/neoism.v1"
@@ -20,10 +21,61 @@ const (
 	URL           = "http://api.ltp-cloud.com/analysis/"
 )
 
+func init() {
+}
+
 func main() {
-	// fmt.Println(getCiXing("我"))
 	myNeo, err := neoism.Connect(HOST)
 	checkErr(err)
+	// CQL := `
+	// 	START a=node(*),b=node(*)
+	// 	WHERE a.name='你' AND b.name='好'
+	// 	CREATE (a)-[n:connectTo{termsNum:'0',relPinyin:'hhhh',thisTermNum:'2'}]->(b)
+	// 	RETURN n
+	// `
+
+	// addCQL(myNeo, CQL)
+	dat, err := ioutil.ReadFile("rescourse/terms.tsv")
+	checkErr(err)
+
+	res := strings.Split(string(dat), "\n")
+
+	for k := 0; k < len(res); k++ {
+		// fmt.Println(strings.Split(res[k], "\t")[1])
+		term := strings.Split(strings.Split(res[k], ",")[1], "")
+		relPinyin := strings.Split(res[k], ",")[2]
+		if len(term) < 1 {
+			fmt.Println("No Create Relationship")
+		} else {
+			for j := 0; j < len(term)-1; j++ {
+				fN := term[j]
+				sN := term[j+1]
+				termsLen := strconv.Itoa(len(term))
+				fromTo := strconv.Itoa(j) + `-` + strconv.Itoa(j+1)
+				CQL := "START a=node(*),b=node(*) WHERE a.name='" + fN + "' AND b.name='" + sN + "' CREATE (a)-[n:connectTo{termsLen:'" + termsLen + "',relPinyin:'" + relPinyin + "',fromTo:'" + fromTo + "'}]->(b) RETURN n"
+				addCQL(myNeo, CQL)
+				fmt.Println(CQL)
+			}
+		}
+
+		// fmt.Println(term, relPinyin)
+	}
+
+}
+
+func addCQL(r *neoism.Database, c string) {
+
+	cq1 := neoism.CypherQuery{
+		Statement: c,
+	}
+	err := r.Cypher(&cq1)
+	checkErr(err)
+}
+
+func createNodes() {
+	myNeo, err := neoism.Connect(HOST)
+	checkErr(err)
+	// fmt.Println(getCiXing("我"))
 
 	dat, err := ioutil.ReadFile("rescourse/single_word.tsv")
 	checkErr(err)
@@ -33,26 +85,20 @@ func main() {
 		// poSpeech := getCiXing(name)
 		pinyin := strings.Split(res[i], "\t")[2]
 		label := strings.ToUpper(strings.Split(pinyin, "")[0])
-		// fNode, err := myNeo.CreateNode(neoism.Props{"name": name, "pinyin": pinyin})
-		// checkErr(err)
-		// defer fNode.Delete() // Deferred clean up
-		// fNode.AddLabel(label)
-		// log.Printf("\nNode data: %v\n", fNode)
+
 		fmt.Println(name + "," + pinyin + "," + (label))
 
 		res0 := []struct {
 			N neoism.Node // Column "n" gets automagically unmarshalled into field N
 		}{}
 		cq0 := neoism.CypherQuery{
-			Statement: "CREATE (n:" + label + " {name: {name},pinyin: {pinyin}}) RETURN n",
-			// Use parameters instead of constructing a query string
+			Statement:  "CREATE (n:" + label + " {name: {name},pinyin: {pinyin}}) RETURN n",
 			Parameters: neoism.Props{"name": name, "pinyin": pinyin},
 			Result:     &res0,
 		}
 		myNeo.Cypher(&cq0)
 		n1 := res0[0].N // Only one row of data returned
 		n1.Db = myNeo   // Must manually set Db with objects returned from Cypher query
-
 	}
 }
 
