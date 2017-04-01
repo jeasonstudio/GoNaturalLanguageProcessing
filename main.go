@@ -27,6 +27,15 @@ func init() {
 func main() {
 	myNeo, err := neoism.Connect(HOST)
 	checkErr(err)
+	CQL := `
+		
+	`
+	addCQL(myNeo, CQL)
+}
+
+func luru() {
+	myNeo, err := neoism.Connect(HOST)
+	checkErr(err)
 	// CQL := `
 	// 	START a=node(*),b=node(*)
 	// 	WHERE a.name='你' AND b.name='好'
